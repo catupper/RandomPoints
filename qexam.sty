@@ -1,0 +1,201 @@
+%==========================================
+% qexam.sty - style file for exams
+%-------------------------------------------------------------------
+% 2009-07-07 Taku Yamanaka (Physics Dept., Osaka Univ.)
+%-------------------------------------------------------------------
+% Revision History
+% 2009-07-07 v1.0 Taku
+% 2009-07-08 v1.1 Taku
+%			Redefined \figure to omit ':' after figure numbers in figure captions.
+% 2009-07-08 v1.2 Taku
+%			Renamed it to qexam.sty.  "exam.sty" existed already at:
+%			http://www.tex.ac.uk/tex-archive/macros/latex209/contrib/misc/exam.sty .
+%			Why "q"exam?  No good reason.  Just because most of the commands 
+%			in this package starts with "q".
+% 2009-07-11 v1.3 Taku
+%			Added \vspace in qlist environment to allow fine adjustments.
+%			Added an option for qlist environment to specify a prefix for qitem.
+%			Introduced \questionFormat to allow defining the question number format outside qexam.sty.
+%			Added question/qpart/qlist margins as lengths adjustable from outside.
+%			Removed lines for using geometry package and setting pagestyle to empty.  These should be 
+%			done inside the user's file.
+%			Added \qUseNoColonInFigureCaption and \qUseStandardFigureCaption
+%			to allow switching between figure captions without and with colons.
+%			Added \qpartFormat.
+%-------------------------------------------------------------------
+
+%\usepackage[a4paper,text={17cm,25cm},centering]{geometry}
+%\pagestyle{empty}
+
+\newcounter{qpartNumber}
+\newcounter{enumqSave}
+
+\newlength{\questionTopMargin}		\setlength{\questionTopMargin}{\bigskipamount}
+\newlength{\questionBottomMargin}	\setlength{\questionBottomMargin}{\bigskipamount}
+\newlength{\qpartMargin}			\setlength{\qpartMargin}{0mm}
+\newlength{\qlistTopMargin}			\setlength{\qlistTopMargin}{\bigskipamount}
+\newlength{\qlistBottomMargin}		\setlength{\qlistBottomMargin}{\bigskipamount}
+\newlength{\qlistTwoTopMargin}		\setlength{\qlistTwoTopMargin}{0mm}
+\newlength{\qlistTwoBottomMargin}	\setlength{\qlistTwoBottomMargin}{0mm}
+
+%--------------------------------------------
+%	queston
+%--------------------------------------------
+
+\newcommand{\questionNoSkip}[1]{%
+	\setcounter{qpartNumber}{0}
+	\setcounter{enumqSave}{0}
+	\vspace{\questionTopMargin}
+	\noindent
+	\questionFormat{#1}%
+}
+
+\newcommand{\question}[1]{%
+	\questionNoSkip{#1}
+	\par
+	\vspace{\questionBottomMargin}
+}
+
+% To make your own question number format, 
+% copy this \newcommand{\questionFormat}[1]{...} to your source code, 
+% change it to \renewcommand{\questionFormat}{...} and edit it.
+%-----------------------------------------
+\newcommand{\questionFormat}[1]{%
+	\textbf{\Large{#1}}
+% Here are some examples.  Tune them as you like.
+%	\framebox{\LARGE{#1}}
+%	\hspace{-5mm}\textbf{\Huge{[#1]}}
+%	\begin{center}{\textbf{\LARGE{#1}}}\end{center}
+}
+%-----------------------------------------
+
+%--------------------------------------------
+%	qparts
+%--------------------------------------------
+
+\newenvironment{qparts}{%
+	\begin{itemize}% Use itemize instead of enumerate, and keep enumerate for \qlist.
+				% Otherwise, \ref that refers to a \qitem will show something like "2c".
+}{%
+	\end{itemize}
+}
+
+% To make your own qpart number format, 
+% copy this \qpart command definition to your file, 
+% change it to \renewcommand{\qpart}{...} and edit it.
+\newcommand{\qpart}{%
+	\vspace{\qpartMargin} % To adjust the gap before qpart, adjust this parameter.
+	\stepcounter{qpartNumber}
+%	\item [\textbf{\Roman{qpartNumber}}.]
+	\qpartFormat{qpartNumber}
+}
+
+\newcommand{\qpartFormat}[1]{%
+	\item [\textbf{\Roman{#1}}.]
+}
+	
+
+%--------------------------------------------
+%	qlislt, qlist2
+%--------------------------------------------
+
+% globally used prefixes for qlist and qlist2 items.
+\newcommand{\qitemPrefixi}{}
+\newcommand{\qitemPrefixii}{}
+
+\newenvironment{qlist}[1][]{%
+	% \begin{qlist} generates (1), (2), (3), ... .
+	% \begin{qlist}[E-] generates (E-1), (E-2), (E-3), ... .
+	\vspace{\qlistTopMargin}
+	\let\savedLabelenumi=\labelenumi
+	\renewcommand{\labelenumi}{\textbf{(\qitemPrefixi{#1}\arabic{enumi})}}
+	\begin{enumerate}
+		\setcounter{enumi}{\value{enumqSave}}
+}{%
+	\end{enumerate}
+	\setcounter{enumqSave}{\value{enumi}}
+	\let\labelenumi=\savedLabelenumi % Don't use \renewcommand.  You will go into an infinite loop.
+	\vspace{\qlistBottomMargin}
+%	\par\bigskip\noindent
+}
+
+\newenvironment{qlist2}[1][]{%
+	% \begin{qlist2} generates (1), (2), (3), ... .
+	% \begin{qlist2}[A-] generates (A-1), (A-2), (A-3), ... .
+	% \begin{qlist2}[\arabic{enumi}-] generates (2-1), (2-2), (2-3), ... if it is in the 2nd qlist item.
+	\vspace{\qlistTwoTopMargin}
+	\let\savedLabelenumii=\labelenumii
+	\renewcommand{\labelenumii}{\textbf{(\qitemPrefixii{#1}\alph{enumii})}}
+	\begin{enumerate}
+}{%
+	\end{enumerate}
+	\vspace{\qlistTwoBottomMargin}
+	\let\labelenumii=\savedLabelenumii
+}
+	
+
+\newcommand{\qitem}{% Well, it's just an \item, but it is defined anyway to allow future format changes.
+	\item
+}
+
+\newcommand{\qref}[1]{%
+	(\ref{#1})
+}
+
+% Modified \figure to remove ':' from figure and table captions.
+% Reference: "The LaTeX Companion", Goosesens, Mittelbach and Samarin, p.155, Addison-Wesley (1994).
+% If you want the original figure caption format, comment out the next line.
+\newcommand{\qUseNoColonInCaptions}{%
+	\renewcommand{\figure}{\let\@makecaption\@makefigcaption\@float{figure}}
+	\renewcommand{\table}{\let\@makecaption\@makefigcaption\@float{table}}
+}
+
+\newcommand{\qUseStandardCaptions}{%
+	\renewcommand{\figure}{\@float{figure}}
+	\renewcommand{\table}{\@float{table}}
+}
+
+
+% Original makecaption was copied from jarticle.cls 2002/04/09 v1.4.
+% Removed ':' from "#1: #2".
+\long\def\@makefigcaption#1#2{%
+  \vskip\abovecaptionskip
+  \iftdir\sbox\@tempboxa{#1\hskip1zw#2}%
+    \else\sbox\@tempboxa{#1 #2}%
+  \fi
+  \ifdim \wd\@tempboxa >\hsize
+    \iftdir #1\hskip1zw#2\relax\par
+      \else #1 #2\relax\par\fi
+  \else
+    \global \@minipagefalse
+    \hbox to\hsize{\hfil\box\@tempboxa\hfil}%
+  \fi
+  \vskip\belowcaptionskip}
+
+%==================================================
+%	standard setup for qexam 
+%==================================================
+  
+\qUseNoColonInCaptions	% default = no colons in figure captions
+							% To use standard figure caption, execute
+							% \qUseStandardFigureCaption in user's source file.
+
+
+%==================================================
+%Fair License
+
+%<Copyright Information>
+
+%Usage of the works is permitted provided that this
+%instrument is retained with the works, so that any entity
+%that uses the works is notified of this instrument.
+
+%DISCLAIMER: THE WORKS ARE WITHOUT WARRANTY.
+
+%[2004, Fair License: rhid.com/fair]
+%==================================================
+% You may edit/modify this package at your own risk.
+% If there are important fixes or changes that you think should be 
+% reflected in the standard distribution, please notify:
+%	taku@hep.sci.osaka-u.ac.jp  .
+%==================================================
