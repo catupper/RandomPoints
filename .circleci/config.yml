@@ -1,9 +1,8 @@
-version: 1
+version: 2
 jobs:
   build:
     docker:
       -image: paperist/alpine-texlive-ja
-
     steps:
       - checkout
 
