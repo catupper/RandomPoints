@@ -2,10 +2,9 @@ version: 2
 jobs:
   build:
     docker:
-      -image: paperist/alpine-texlive-ja
+      - image: paperist/alpine-texlive-ja
     steps:
       - checkout
-
       - run:
           name: Generating current version
           command: |
