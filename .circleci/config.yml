@@ -1,0 +1,14 @@
+version: 1
+jobs:
+  build:
+    docker:
+      -image: paperist/alpine-texlive-ja
+
+    steps:
+      - checkout
+
+      - run:
+          name: Generating current version
+          command: |
+            latexmk editorial.tex
+      
