@@ -4,17 +4,17 @@ jobs:
     docker:
       - image: paperist/alpine-texlive-ja
 
-    working_directory: /tmp
+    working_directory: ~
     steps:
       - checkout
       - run:
           name: Generating TeX version
           command: |
-            mkdir /tmp/artifacts;
+            mkdir ~/work;
             latexmk editorial.tex;
-            cp editorial.pdf /tmp/artifacts/.
+            cp editorial.pdf ~/work/.
 
       - store_artifacts:
-          path: /tmp/artifacts
+          path: ~/work
             
       
