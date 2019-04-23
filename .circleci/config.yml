@@ -10,6 +10,7 @@ jobs:
       - run:
           name: Generating TeX version
           command: |
+            apk --no-cache add ca-certificates
             mkdir ~/work;
             latexmk editorial.tex;
             cp editorial.pdf ~/work/.
