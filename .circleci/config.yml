@@ -1,6 +1,9 @@
 version: 2
 jobs:
   build:
+    filters:
+      branchs:
+        only: master
     docker:
       - image: paperist/alpine-texlive-ja
 
