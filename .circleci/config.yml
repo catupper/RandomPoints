@@ -28,6 +28,7 @@ jobs:
           name: Commit to repository
           command: |
             git checkout release-pdf
+            git reset --hard origin/release-pdf
             mkdir work
             cp editorial.pdf work/editorial.pdf
             git add -f work/editorial.pdf
