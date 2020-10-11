@@ -29,7 +29,6 @@ jobs:
           command: |
             git checkout release-pdf
             git reset --hard origin/release-pdf
-            mkdir work
             cp editorial.pdf work/editorial.pdf
             git add -f work/editorial.pdf
             git commit -m "[CircleCI] Generate PDF @$(date +'%Y/%m/%d %I:%M') [ci skip]"
